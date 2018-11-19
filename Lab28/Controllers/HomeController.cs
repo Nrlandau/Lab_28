@@ -70,5 +70,14 @@ namespace Lab28.Controllers
             deck = JObject.Parse(data)["deck_id"].ToString();
             return RedirectToAction("DisplayCards");
         }
+        public ActionResult Shuffle()
+        {
+            HttpWebRequest request = WebRequest.CreateHttp($"https://deckofcardsapi.com/api/deck/{deck}/shuffle");
+            request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0";
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            return RedirectToAction("DisplayCards");
+
+        }
     }
 }

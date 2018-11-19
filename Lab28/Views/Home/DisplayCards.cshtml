@@ -4,5 +4,15 @@
     ViewBag.Title = "DisplayCards";
 }
 <!-- Displays 5 cards from the controler -->
-<h2>DisplayCards</h2>
-
+<h2>Number of cards left in the deck : @ViewBag.CardsLeft</h2>
+<form action="/Home/Shuffle">
+    <input type="submit" value="SHUFFLE"/>
+</form>
+<form>
+    <input type="submit" value="DRAW" />
+</form>
+@foreach(var c in Model)
+{
+    <h2>@c.Value of @c.Suit</h2>
+    <img src="@c.ImageURL" />
+}
