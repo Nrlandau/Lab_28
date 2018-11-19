@@ -7,8 +7,8 @@ namespace Lab28.Models
 {
     public class Card
     {
-        string ImageURL { get; set; }
-        string Value { get; set; }
-        string Suit { get; set; }
+        public string ImageURL { get; set; }
+        public string Value { get; set; }
+        public string Suit { get; set; }
     }
 }
