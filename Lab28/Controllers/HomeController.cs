@@ -13,7 +13,7 @@ namespace Lab28.Controllers
 {
     public class HomeController : Controller
     {
-        public static string deck;
+        //public static string deck;
         public ActionResult Index()
         {
             return View();
@@ -34,12 +34,13 @@ namespace Lab28.Controllers
         }
         public ActionResult DisplayCards()
         {
-            if(deck == null)
+            HttpCookie cookie = Request.Cookies.Get("Deck_Id");
+            if(cookie == null)
             {
                 return RedirectToAction("CreateNewDeck");
             }
             // should get 5 cards from the api and sends them to the view.
-            HttpWebRequest request = WebRequest.CreateHttp($"https://deckofcardsapi.com/api/deck/{deck}/draw/?count=5");
+            HttpWebRequest request = WebRequest.CreateHttp($"https://deckofcardsapi.com/api/deck/{cookie.Value}/draw/?count=5");
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader dr = new StreamReader(response.GetResponseStream());
@@ -61,23 +62,30 @@ namespace Lab28.Controllers
         }
         public ActionResult CreateNewDeck()
         {
+            HttpCookie cookie = new HttpCookie("Deck_Id");
+            cookie.Expires = (DateTime.Now.AddDays(12));
+
             HttpWebRequest request = WebRequest.CreateHttp("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1");
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader dr = new StreamReader(response.GetResponseStream());
             string data = dr.ReadToEnd();
             dr.Close();
-            deck = JObject.Parse(data)["deck_id"].ToString();
+            cookie.Value = JObject.Parse(data)["deck_id"].ToString();
+            Response.Cookies.Add(cookie);
             return RedirectToAction("DisplayCards");
         }
         public ActionResult Shuffle()
         {
-            HttpWebRequest request = WebRequest.CreateHttp($"https://deckofcardsapi.com/api/deck/{deck}/shuffle");
+            HttpCookie cookie = Request.Cookies.Get("Deck_Id");
+            if (cookie == null)
+            {
+                RedirectToAction("CreateNewDeck");
+            }
+            HttpWebRequest request = WebRequest.CreateHttp($"https://deckofcardsapi.com/api/deck/{cookie.Value}/shuffle");
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
             return RedirectToAction("DisplayCards");
-
         }
     }
 }
